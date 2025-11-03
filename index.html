@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCT Unit Survey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #ffffff;
+            color: #2d2d2d;
+            overflow: hidden;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            z-index: 100;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .logo {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d2d2d;
+        }
+
+        .language-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .lang-btn {
+            padding: 6px 14px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            color: #666;
+        }
+
+        .lang-btn:hover {
+            border-color: #CC785C;
+            color: #CC785C;
+        }
+
+        .lang-btn.active {
+            background: #CC785C;
+            color: white;
+            border-color: #CC785C;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #f5f5f5;
+            z-index: 99;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #CC785C;
+            transition: width 0.3s ease;
+        }
+
+        .questions-container {
+            position: absolute;
+            top: 80px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .question-slide {
+            height: 100vh;
+            padding: 60px 40px 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+        }
+
+        .question-content {
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .question-number {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .question-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #2d2d2d;
+            margin-bottom: 16px;
+            line-height: 1.3;
+        }
+
+        .question-reason {
+            font-size: 15px;
+            color: #666;
+            background: #f8f8f8;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            border-left: 3px solid #CC785C;
+        }
+
+        .question-reason strong {
+            color: #CC785C;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 16px 0;
+            border: none;
+            border-bottom: 2px solid #CC785C;
+            font-size: 20px;
+            background: transparent;
+            color: #2d2d2d;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .answer-input::placeholder {
+            color: #ccc;
+        }
+
+        textarea.answer-input {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        textarea.answer-input:focus {
+            border-color: #CC785C;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 20px 24px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+            background: white;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .option:hover {
+            border-color: #CC785C;
+            background: #fafafa;
+        }
+
+        .option.selected {
+            border-color: #CC785C;
+            background: #fff9f7;
+        }
+
+        .option-letter {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: #f5f5f5;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter {
+            background: #CC785C;
+            color: white;
+        }
+
+        .checkbox-option {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .checkbox-option input[type="checkbox"] {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 22px;
+            height: 22px;
+            cursor: pointer;
+            accent-color: #CC785C;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 14px 32px;
+            border: 2px solid #CC785C;
+            background: white;
+            color: #CC785C;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+            min-width: 120px;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #CC785C;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(204, 120, 92, 0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .nav-btn.primary {
+            background: #CC785C;
+            color: white;
+        }
+
+        .nav-btn.primary:hover:not(:disabled) {
+            background: #b56a4e;
+        }
+
+        .hint {
+            font-size: 14px;
+            color: #999;
+            margin-top: 12px;
+        }
+
+        .final-screen {
+            text-align: center;
+        }
+
+        .final-screen h2 {
+            font-size: 48px;
+            color: #2d2d2d;
+            margin-bottom: 20px;
+        }
+
+        .final-screen p {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            padding: 16px 40px;
+            border: none;
+            background: #CC785C;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .export-btn:hover {
+            background: #b56a4e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(204, 120, 92, 0.3);
+        }
+
+        .enter-hint {
+            position: fixed;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .enter-key {
+            padding: 4px 8px;
+            background: #f5f5f5;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .lang-btn {
+                padding: 5px 10px;
+                font-size: 12px;
+            }
+
+            .question-slide {
+                padding: 40px 20px 120px;
+            }
+
+            .question-title {
+                font-size: 22px;
+                margin-bottom: 12px;
+            }
+
+            .question-reason {
+                font-size: 13px;
+                padding: 10px 12px;
+                margin-bottom: 24px;
+            }
+
+            .option {
+                font-size: 16px;
+                padding: 16px 20px;
+            }
+
+            .answer-input {
+                font-size: 16px;
+            }
+
+            textarea.answer-input {
+                min-height: 120px;
+                padding: 12px;
+            }
+
+            .navigation {
+                bottom: 20px;
+                gap: 8px;
+            }
+
+            .nav-btn {
+                padding: 12px 24px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+
+            .enter-hint {
+                bottom: 80px;
+                font-size: 11px;
+            }
+
+            .final-screen h2 {
+                font-size: 32px;
+            }
+
+            .final-screen p {
+                font-size: 16px;
+            }
+
+            .export-btn {
+                padding: 14px 30px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .question-title {
+                font-size: 20px;
+            }
+
+            .option {
+                padding: 14px 16px;
+                font-size: 15px;
+            }
+
+            .checkbox-option {
+                padding-left: 45px;
+            }
+
+            .checkbox-option input[type="checkbox"] {
+                left: 15px;
+                width: 20px;
+                height: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">MCT Unit Survey</div>
+        <div class="language-selector">
+            <button class="lang-btn active" onclick="changeLanguage('ru')">RU</button>
+            <button class="lang-btn" onclick="changeLanguage('en')">EN</button>
+            <button class="lang-btn" onclick="changeLanguage('es')">ES</button>
+        </div>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <div class="questions-container" id="questionsContainer"></div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="previousQuestion()" disabled>
+            <span class="nav-text">↑ Назад</span>
+        </button>
+        <button class="nav-btn primary" id="nextBtn" onclick="nextQuestion()">
+            <span class="nav-text">Далее</span>
+        </button>
+    </div>
+
+    <div class="enter-hint">
+        Нажмите <span class="enter-key">Enter</span> или <span class="enter-key">↓</span> для продолжения
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let currentLanguage = 'ru';
+        const answers = {};
+
+        const questions = {
+            ru: [
+                // Секция 1: Версионирование устройств
+                {
+                    type: 'radio',
+                    title: 'Существуют ли различные аппаратные ревизии MCT Unit?',
+                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
+                    options: ['Да', 'Нет', 'Не знаю']
+                },
+                {
+                    type: 'text',
+                    title: 'Используются ли номера моделей или аппаратные версии (например: v1.0, v2.0, Rev.A, Rev.B)?',
+                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
+                    placeholder: 'Введите версии через запятую'
+                },
+                {
+                    type: 'checkbox',
+                    title: 'Как определить аппаратную версию конкретного устройства?',
+                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
+                    options: [
+                        'Серийный номер',
+                        'Маркировка на корпусе',
+                        'Отображение на экране',
+                        'В меню настроек',
+                        'Из документации',
+                        'Другое'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Влияет ли аппаратная версия на совместимость с прошивками?',
+                    reason: 'Корректная идентификация устройств и определение совместимости прошивок.',
+                    options: ['Да, значительно влияет', 'Частично влияет', 'Не влияет', 'Не знаю']
+                },
+                
+                // Секция 2: Схема нумерации прошивок
+                {
+                    type: 'text',
+                    title: 'Какой официальный формат используется для версий прошивок?',
+                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
+                    placeholder: 'Например: V[MM][YY], major.minor.patch'
+                },
+                {
+                    type: 'radio',
+                    title: 'Версия V0923 предполагает формат V[MM][YY] (месяц-год). Это корректно?',
+                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
+                    options: ['Да, корректно', 'Нет, формат другой', 'Частично корректно']
+                },
+                {
+                    type: 'textarea',
+                    title: 'Какие версии прошивок существуют на данный момент?',
+                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
+                    placeholder: 'Перечислите все известные версии...'
+                },
+                {
+                    type: 'radio',
+                    title: 'Используются ли patch-версии внутри периода (например, V0923.1, V0923.2)?',
+                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
+                    options: ['Да', 'Нет', 'Планируется']
+                },
+                {
+                    type: 'radio',
+                    title: 'Применяется ли семантическое версионирование (major.minor.patch)?',
+                    reason: 'Правильная интерпретация версий, их сортировка и отображение в системе.',
+                    options: ['Да', 'Нет', 'Частично']
+                },
+                
+                // Секция 3: Модели устройств
+                {
+                    type: 'textarea',
+                    title: 'Какие модели устройств MCT Unit существуют на текущий момент?',
+                    reason: 'Построение справочника моделей и определение совместимости.',
+                    placeholder: 'Перечислите все модели с официальными названиями...'
+                },
+                {
+                    type: 'text',
+                    title: 'Как правильно называются эти модели?',
+                    reason: 'Построение справочника моделей и определение совместимости.',
+                    placeholder: 'Официальные наименования моделей'
+                },
+                {
+                    type: 'radio',
+                    title: 'Планируются ли выпуски новых моделей в ближайшее время?',
+                    reason: 'Построение справочника моделей и определение совместимости.',
+                    options: ['Да, в этом году', 'Да, в следующем году', 'Нет', 'Не знаю']
+                },
+                {
+                    type: 'textarea',
+                    title: 'В чём ключевые различия между моделями (если есть)?',
+                    reason: 'Построение справочника моделей и определение совместимости.',
+                    placeholder: 'Опишите технические и функциональные различия...'
+                },
+                
+                // Секция 4: Матрица совместимости
+                {
+                    type: 'textarea',
+                    title: 'Какие прошивки совместимы с какими моделями устройств?',
+                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
+                    placeholder: 'Опишите матрицу совместимости...'
+                },
+                {
+                    type: 'radio',
+                    title: 'Поддерживается ли обратная совместимость (старые устройства + новые прошивки)?',
+                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
+                    options: ['Да, полностью', 'Частично', 'Нет', 'Зависит от модели']
+                },
+                {
+                    type: 'radio',
+                    title: 'Поддерживается ли прямая совместимость (новые устройства + старые прошивки)?',
+                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
+                    options: ['Да, полностью', 'Частично', 'Нет', 'Не рекомендуется']
+                },
+                {
+                    type: 'radio',
+                    title: 'Возможен ли downgrade прошивки на более раннюю версию?',
+                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
+                    options: ['Да, всегда', 'Да, но с ограничениями', 'Нет', 'Не рекомендуется']
+                },
+                {
+                    type: 'textarea',
+                    title: 'Существуют ли ограничения или рекомендации по обновлению между версиями?',
+                    reason: 'Предотвращение установки несовместимых прошивок и корректные рекомендации пользователям.',
+                    placeholder: 'Опишите ограничения и рекомендации...'
+                },
+                
+                // Секция 5: Технические характеристики файлов прошивки
+                {
+                    type: 'checkbox',
+                    title: 'Какой формат файлов прошивки используется?',
+                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    options: ['.bin', '.hex', '.fw', '.dat', '.zip архив', 'Другой']
+                },
+                {
+                    type: 'text',
+                    title: 'Типичный размер файла прошивки (в МБ)?',
+                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    placeholder: 'Например: 512 МБ или 1-2 ГБ'
+                },
+                {
+                    type: 'radio',
+                    title: 'Прошивка поставляется как одиночный файл или как архив (.zip)?',
+                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    options: ['Одиночный файл', 'ZIP архив', 'Другой архив', 'Зависит от версии']
+                },
+                {
+                    type: 'checkbox',
+                    title: 'Используются ли цифровые подписи для верификации целостности?',
+                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    options: [
+                        'MD5 checksum',
+                        'SHA-256 checksum',
+                        'Цифровая подпись',
+                        'Другой метод',
+                        'Не используются'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Есть ли служебные метаданные в составе файла прошивки?',
+                    reason: 'Валидация файлов при загрузке, верификация целостности, планирование хранилища.',
+                    options: ['Да', 'Нет', 'Не знаю']
+                },
+                
+                // Секция 6: Метаданные прошивок
+                {
+                    type: 'textarea',
+                    title: 'Какая официальная информация должна сопровождать каждую версию прошивки?',
+                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
+                    placeholder: 'Опишите необходимые метаданные...'
+                },
+                {
+                    type: 'radio',
+                    title: 'Публикуются ли changelog (описание изменений) для каждой версии?',
+                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
+                    options: ['Да, всегда', 'Иногда', 'Нет', 'Планируется']
+                },
+                {
+                    type: 'radio',
+                    title: 'Указывается ли официальная дата релиза?',
+                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
+                    options: ['Да', 'Нет']
+                },
+                {
+                    type: 'radio',
+                    title: 'Существуют ли критические обновления, требующие обязательной установки?',
+                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
+                    options: ['Да', 'Нет', 'Редко', 'Планируется']
+                },
+                {
+                    type: 'radio',
+                    title: 'Публикуется ли информация о совместимости с конкретными аппаратными ревизиями?',
+                    reason: 'Полнота информации для пользователей и корректное управление обновлениями.',
+                    options: ['Да, всегда', 'Иногда', 'Нет']
+                },
+                
+                // Секция 7: Процесс обновления прошивок
+                {
+                    type: 'checkbox',
+                    title: 'Каким способом выполняется обновление прошивки?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    options: [
+                        'Через USB-накопитель',
+                        'Ethernet/LAN',
+                        'Wi-Fi',
+                        'Веб-интерфейс',
+                        'Другие методы'
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    title: 'Какова детальная процедура обновления прошивки с точки зрения конечного пользователя?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    placeholder: 'Опишите шаг за шагом...'
+                },
+                {
+                    type: 'checkbox',
+                    title: 'Какие требования предъявляются к USB-накопителю (формат файловой системы, минимальный объём)?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    options: [
+                        'FAT32',
+                        'NTFS',
+                        'Минимум 512 МБ',
+                        'Минимум 2 ГБ',
+                        'Нет особых требований'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Нужна ли специальная структура каталогов на USB-накопителе?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    options: ['Да', 'Нет', 'Рекомендуется']
+                },
+                {
+                    type: 'text',
+                    title: 'Как устройство идентифицирует файл прошивки на накопителе?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    placeholder: 'Опишите механизм идентификации'
+                },
+                {
+                    type: 'radio',
+                    title: 'Есть ли встроенная валидация прошивки перед установкой?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    options: ['Да, автоматическая', 'Да, ручная', 'Нет']
+                },
+                {
+                    type: 'text',
+                    title: 'Какова типичная длительность процесса обновления?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    placeholder: 'Например: 5-10 минут'
+                },
+                {
+                    type: 'textarea',
+                    title: 'Возможны ли ошибки при обновлении и как их диагностировать?',
+                    reason: 'Создание понятных инструкций для пользователей системы.',
+                    placeholder: 'Опишите типичные ошибки и способы диагностики...'
+                },
+                
+                // Секция 8: Частота и политика обновлений
+                {
+                    type: 'radio',
+                    title: 'Как часто выходят новые версии прошивок?',
+                    reason: 'Планирование обслуживания системы и информирование пользователей.',
+                    options: [
+                        'Ежемесячно',
+                        'Ежеквартально',
+                        'Раз в полгода',
+                        'По мере необходимости',
+                        'Нет регулярного графика'
+                    ]
+                },
+                {
+                    type: 'checkbox',
+                    title: 'По какому принципу принимается решение о выпуске новой версии?',
+                    reason: 'Планирование обслуживания системы и информирование пользователей.',
+                    options: [
+                        'Bug fixes',
+                        'Новые функции',
+                        'Критические исправления',
+                        'Плановые обновления',
+                        'По запросам клиентов'
+                    ]
+                },
+                {
+                    type: 'text',
+                    title: 'Как долго поддерживаются предыдущие версии прошивок?',
+                    reason: 'Планирование обслуживания системы и информирование пользователей.',
+                    placeholder: 'Например: 1 год, 2 года'
+                },
+                {
+                    type: 'radio',
+                    title: 'Существует ли политика End-of-Life для старых версий?',
+                    reason: 'Планирование обслуживания системы и информирование пользователей.',
+                    options: ['Да', 'Нет', 'В разработке']
+                },
+                
+                // Секция 9: Доступ к прошивкам
+                {
+                    type: 'checkbox',
+                    title: 'Как в настоящее время распространяются прошивки среди клиентов?',
+                    reason: 'Интеграция с существующими процессами распространения обновлений.',
+                    options: [
+                        'Официальный сайт',
+                        'Email рассылка',
+                        'Через дистрибьюторов',
+                        'По запросу',
+                        'Автоматическое уведомление',
+                        'Другое'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Существует ли официальный портал или репозиторий для загрузки прошивок?',
+                    reason: 'Интеграция с существующими процессами распространения обновлений.',
+                    options: ['Да, публичный', 'Да, требуется авторизация', 'Нет', 'В разработке']
+                },
+                {
+                    type: 'radio',
+                    title: 'Требуется ли авторизация для доступа к файлам прошивок?',
+                    reason: 'Интеграция с существующими процессами распространения обновлений.',
+                    options: ['Да', 'Нет', 'Зависит от версии']
+                },
+                {
+                    type: 'text',
+                    title: 'Как осуществляется техническая поддержка при возникновении проблем с обновлением?',
+                    reason: 'Интеграция с существующими процессами распространения обновлений.',
+                    placeholder: 'Опишите каналы поддержки'
+                },
+                {
+                    type: 'radio',
+                    title: 'Доступна ли история всех версий прошивок или только последняя актуальная?',
+                    reason: 'Интеграция с существующими процессами распространения обновлений.',
+                    options: ['Все версии', 'Только последние 5', 'Только текущая', 'Нет архива']
+                },
+                
+                // Секция 10: Документация и обучение
+                {
+                    type: 'checkbox',
+                    title: 'Предоставляется ли техническая документация по обновлению прошивок?',
+                    reason: 'Встроенная справочная система для пользователей.',
+                    options: [
+                        'Да, PDF-руководства',
+                        'Да, онлайн документация',
+                        'Да, видео-инструкции',
+                        'Нет',
+                        'В разработке'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Есть ли видео-инструкции или обучающие материалы?',
+                    reason: 'Встроенная справочная система для пользователей.',
+                    options: ['Да', 'Нет', 'Планируется']
+                },
+                {
+                    type: 'radio',
+                    title: 'Доступны ли эти материалы в цифровом виде для интеграции в систему?',
+                    reason: 'Встроенная справочная система для пользователей.',
+                    options: ['Да, все', 'Частично', 'Нет', 'По запросу']
+                },
+                {
+                    type: 'radio',
+                    title: 'Существуют ли типовые проблемы и их решения (troubleshooting guide)?',
+                    reason: 'Встроенная справочная система для пользователей.',
+                    options: ['Да', 'Нет', 'В разработке']
+                }
+            ],
+            en: [
+                // Section 1: Device Versioning
+                {
+                    type: 'radio',
+                    title: 'Are there different hardware revisions of MCT Unit?',
+                    reason: 'Correct device identification and firmware compatibility determination.',
+                    options: ['Yes', 'No', 'Don\'t know']
+                },
+                {
+                    type: 'text',
+                    title: 'Are model numbers or hardware versions used (e.g., v1.0, v2.0, Rev.A, Rev.B)?',
+                    reason: 'Correct device identification and firmware compatibility determination.',
+                    placeholder: 'Enter versions separated by commas'
+                },
+                {
+                    type: 'checkbox',
+                    title: 'How to determine the hardware version of a specific device?',
+                    reason: 'Correct device identification and firmware compatibility determination.',
+                    options: [
+                        'Serial number',
+                        'Case marking',
+                        'Screen display',
+                        'Settings menu',
+                        'Documentation',
+                        'Other'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Does hardware version affect firmware compatibility?',
+                    reason: 'Correct device identification and firmware compatibility determination.',
+                    options: ['Yes, significantly', 'Partially', 'No', 'Don\'t know']
+                },
+                
+                // Section 2: Firmware Numbering Scheme
+                {
+                    type: 'text',
+                    title: 'What official format is used for firmware versions?',
+                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
+                    placeholder: 'E.g., V[MM][YY], major.minor.patch'
+                },
+                {
+                    type: 'radio',
+                    title: 'Does version V0923 suggest V[MM][YY] format (month-year)? Is this correct?',
+                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
+                    options: ['Yes, correct', 'No, different format', 'Partially correct']
+                },
+                {
+                    type: 'textarea',
+                    title: 'What firmware versions currently exist?',
+                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
+                    placeholder: 'List all known versions...'
+                },
+                {
+                    type: 'radio',
+                    title: 'Are patch versions used within a period (e.g., V0923.1, V0923.2)?',
+                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
+                    options: ['Yes', 'No', 'Planned']
+                },
+                {
+                    type: 'radio',
+                    title: 'Is semantic versioning (major.minor.patch) applied?',
+                    reason: 'Correct interpretation of versions, their sorting and display in the system.',
+                    options: ['Yes', 'No', 'Partially']
+                },
+                
+                // Section 3: Device Models
+                {
+                    type: 'textarea',
+                    title: 'What MCT Unit device models currently exist?',
+                    reason: 'Building a model directory and determining compatibility.',
+                    placeholder: 'List all models with official names...'
+                },
+                {
+                    type: 'text',
+                    title: 'What are the correct names of these models?',
+                    reason: 'Building a model directory and determining compatibility.',
+                    placeholder: 'Official model names'
+                },
+                {
+                    type: 'radio',
+                    title: 'Are new models planned for release soon?',
+                    reason: 'Building a model directory and determining compatibility.',
+                    options: ['Yes, this year', 'Yes, next year', 'No', 'Don\'t know']
+                },
+                {
+                    type: 'textarea',
+                    title: 'What are the key differences between models (if any)?',
+                    reason: 'Building a model directory and determining compatibility.',
+                    placeholder: 'Describe technical and functional differences...'
+                },
+                
+                // Section 4: Compatibility Matrix
+                {
+                    type: 'textarea',
+                    title: 'Which firmwares are compatible with which device models?',
+                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
+                    placeholder: 'Describe compatibility matrix...'
+                },
+                {
+                    type: 'radio',
+                    title: 'Is backward compatibility supported (old devices + new firmware)?',
+                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
+                    options: ['Yes, fully', 'Partially', 'No', 'Depends on model']
+                },
+                {
+                    type: 'radio',
+                    title: 'Is forward compatibility supported (new devices + old firmware)?',
+                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
+                    options: ['Yes, fully', 'Partially', 'No', 'Not recommended']
+                },
+                {
+                    type: 'radio',
+                    title: 'Is firmware downgrade to earlier version possible?',
+                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
+                    options: ['Yes, always', 'Yes, with limitations', 'No', 'Not recommended']
+                },
+                {
+                    type: 'textarea',
+                    title: 'Are there limitations or recommendations for updating between versions?',
+                    reason: 'Preventing incompatible firmware installation and correct user recommendations.',
+                    placeholder: 'Describe limitations and recommendations...'
+                },
+                
+                // Section 5: Firmware File Technical Specifications
+                {
+                    type: 'checkbox',
+                    title: 'What firmware file format is used?',
+                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    options: ['.bin', '.hex', '.fw', '.dat', '.zip archive', 'Other']
+                },
+                {
+                    type: 'text',
+                    title: 'Typical firmware file size (in MB)?',
+                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    placeholder: 'E.g., 512 MB or 1-2 GB'
+                },
+                {
+                    type: 'radio',
+                    title: 'Is firmware supplied as single file or archive (.zip)?',
+                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    options: ['Single file', 'ZIP archive', 'Other archive', 'Depends on version']
+                },
+                {
+                    type: 'checkbox',
+                    title: 'Are digital signatures used for integrity verification?',
+                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    options: [
+                        'MD5 checksum',
+                        'SHA-256 checksum',
+                        'Digital signature',
+                        'Other method',
+                        'Not used'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Are there service metadata in the firmware file?',
+                    reason: 'File validation on upload, integrity verification, storage planning.',
+                    options: ['Yes', 'No', 'Don\'t know']
+                },
+                
+                // Section 6: Firmware Metadata
+                {
+                    type: 'textarea',
+                    title: 'What official information should accompany each firmware version?',
+                    reason: 'Complete information for users and correct update management.',
+                    placeholder: 'Describe required metadata...'
+                },
+                {
+                    type: 'radio',
+                    title: 'Is changelog (description of changes) published for each version?',
+                    reason: 'Complete information for users and correct update management.',
+                    options: ['Yes, always', 'Sometimes', 'No', 'Planned']
+                },
+                {
+                    type: 'radio',
+                    title: 'Is official release date specified?',
+                    reason: 'Complete information for users and correct update management.',
+                    options: ['Yes', 'No']
+                },
+                {
+                    type: 'radio',
+                    title: 'Are there critical updates requiring mandatory installation?',
+                    reason: 'Complete information for users and correct update management.',
+                    options: ['Yes', 'No', 'Rarely', 'Planned']
+                },
+                {
+                    type: 'radio',
+                    title: 'Is compatibility information with specific hardware revisions published?',
+                    reason: 'Complete information for users and correct update management.',
+                    options: ['Yes, always', 'Sometimes', 'No']
+                },
+                
+                // Section 7: Firmware Update Process
+                {
+                    type: 'checkbox',
+                    title: 'How is firmware update performed?',
+                    reason: 'Creating clear instructions for system users.',
+                    options: [
+                        'Via USB drive',
+                        'Ethernet/LAN',
+                        'Wi-Fi',
+                        'Web interface',
+                        'Other methods'
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    title: 'What is the detailed firmware update procedure from end user perspective?',
+                    reason: 'Creating clear instructions for system users.',
+                    placeholder: 'Describe step by step...'
+                },
+                {
+                    type: 'checkbox',
+                    title: 'What are USB drive requirements (file system format, minimum size)?',
+                    reason: 'Creating clear instructions for system users.',
+                    options: [
+                        'FAT32',
+                        'NTFS',
+                        'Minimum 512 MB',
+                        'Minimum 2 GB',
+                        'No special requirements'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Is special directory structure needed on USB drive?',
+                    reason: 'Creating clear instructions for system users.',
+                    options: ['Yes', 'No', 'Recommended']
+                },
+                {
+                    type: 'text',
+                    title: 'How does device identify firmware file on the drive?',
+                    reason: 'Creating clear instructions for system users.',
+                    placeholder: 'Describe identification mechanism'
+                },
+                {
+                    type: 'radio',
+                    title: 'Is there built-in firmware validation before installation?',
+                    reason: 'Creating clear instructions for system users.',
+                    options: ['Yes, automatic', 'Yes, manual', 'No']
+                },
+                {
+                    type: 'text',
+                    title: 'What is typical update process duration?',
+                    reason: 'Creating clear instructions for system users.',
+                    placeholder: 'E.g., 5-10 minutes'
+                },
+                {
+                    type: 'textarea',
+                    title: 'Are errors possible during update and how to diagnose them?',
+                    reason: 'Creating clear instructions for system users.',
+                    placeholder: 'Describe typical errors and diagnosis methods...'
+                },
+                
+                // Section 8: Update Frequency and Policy
+                {
+                    type: 'radio',
+                    title: 'How often are new firmware versions released?',
+                    reason: 'System maintenance planning and user notification.',
+                    options: [
+                        'Monthly',
+                        'Quarterly',
+                        'Semi-annually',
+                        'As needed',
+                        'No regular schedule'
+                    ]
+                },
+                {
+                    type: 'checkbox',
+                    title: 'What principle determines new version release?',
+                    reason: 'System maintenance planning and user notification.',
+                    options: [
+                        'Bug fixes',
+                        'New features',
+                        'Critical fixes',
+                        'Scheduled updates',
+                        'Customer requests'
+                    ]
+                },
+                {
+                    type: 'text',
+                    title: 'How long are previous firmware versions supported?',
+                    reason: 'System maintenance planning and user notification.',
+                    placeholder: 'E.g., 1 year, 2 years'
+                },
+                {
+                    type: 'radio',
+                    title: 'Is there End-of-Life policy for old versions?',
+                    reason: 'System maintenance planning and user notification.',
+                    options: ['Yes', 'No', 'In development']
+                },
+                
+                // Section 9: Firmware Access
+                {
+                    type: 'checkbox',
+                    title: 'How are firmwares currently distributed to clients?',
+                    reason: 'Integration with existing update distribution processes.',
+                    options: [
+                        'Official website',
+                        'Email distribution',
+                        'Through distributors',
+                        'On request',
+                        'Automatic notification',
+                        'Other'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Is there official portal or repository for firmware downloads?',
+                    reason: 'Integration with existing update distribution processes.',
+                    options: ['Yes, public', 'Yes, requires authorization', 'No', 'In development']
+                },
+                {
+                    type: 'radio',
+                    title: 'Is authorization required for firmware file access?',
+                    reason: 'Integration with existing update distribution processes.',
+                    options: ['Yes', 'No', 'Depends on version']
+                },
+                {
+                    type: 'text',
+                    title: 'How is technical support provided for update problems?',
+                    reason: 'Integration with existing update distribution processes.',
+                    placeholder: 'Describe support channels'
+                },
+                {
+                    type: 'radio',
+                    title: 'Is history of all firmware versions available or only latest?',
+                    reason: 'Integration with existing update distribution processes.',
+                    options: ['All versions', 'Only last 5', 'Only current', 'No archive']
+                },
+                
+                // Section 10: Documentation and Training
+                {
+                    type: 'checkbox',
+                    title: 'Is technical documentation on firmware updates provided?',
+                    reason: 'Built-in help system for users.',
+                    options: [
+                        'Yes, PDF manuals',
+                        'Yes, online documentation',
+                        'Yes, video tutorials',
+                        'No',
+                        'In development'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: 'Are video tutorials or training materials available?',
+                    reason: 'Built-in help system for users.',
+                    options: ['Yes', 'No', 'Planned']
+                },
+                {
+                    type: 'radio',
+                    title: 'Are these materials available digitally for system integration?',
+                    reason: 'Built-in help system for users.',
+                    options: ['Yes, all', 'Partially', 'No', 'On request']
+                },
+                {
+                    type: 'radio',
+                    title: 'Are there typical problems and solutions (troubleshooting guide)?',
+                    reason: 'Built-in help system for users.',
+                    options: ['Yes', 'No', 'In development']
+                }
+            ],
+            es: [
+                // Sección 1: Versionado de Dispositivos
+                {
+                    type: 'radio',
+                    title: '¿Existen diferentes revisiones de hardware de MCT Unit?',
+                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
+                    options: ['Sí', 'No', 'No sé']
+                },
+                {
+                    type: 'text',
+                    title: '¿Se utilizan números de modelo o versiones de hardware (ej., v1.0, v2.0, Rev.A, Rev.B)?',
+                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
+                    placeholder: 'Ingrese versiones separadas por comas'
+                },
+                {
+                    type: 'checkbox',
+                    title: '¿Cómo determinar la versión de hardware de un dispositivo específico?',
+                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
+                    options: [
+                        'Número de serie',
+                        'Marcado en carcasa',
+                        'Pantalla del dispositivo',
+                        'Menú de configuración',
+                        'Documentación',
+                        'Otro'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: '¿La versión de hardware afecta la compatibilidad con firmware?',
+                    reason: 'Identificación correcta de dispositivos y determinación de compatibilidad de firmware.',
+                    options: ['Sí, significativamente', 'Parcialmente', 'No', 'No sé']
+                },
+                
+                // Sección 2: Esquema de Numeración de Firmware
+                {
+                    type: 'text',
+                    title: '¿Qué formato oficial se usa para versiones de firmware?',
+                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
+                    placeholder: 'Ej., V[MM][AA], major.minor.patch'
+                },
+                {
+                    type: 'radio',
+                    title: '¿La versión V0923 sugiere formato V[MM][AA] (mes-año)? ¿Es correcto?',
+                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
+                    options: ['Sí, correcto', 'No, formato diferente', 'Parcialmente correcto']
+                },
+                {
+                    type: 'textarea',
+                    title: '¿Qué versiones de firmware existen actualmente?',
+                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
+                    placeholder: 'Liste todas las versiones conocidas...'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se usan versiones de parche dentro de un período (ej., V0923.1, V0923.2)?',
+                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
+                    options: ['Sí', 'No', 'Planificado']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se aplica versionado semántico (major.minor.patch)?',
+                    reason: 'Interpretación correcta de versiones, su ordenamiento y visualización en el sistema.',
+                    options: ['Sí', 'No', 'Parcialmente']
+                },
+                
+                // Sección 3: Modelos de Dispositivos
+                {
+                    type: 'textarea',
+                    title: '¿Qué modelos de dispositivos MCT Unit existen actualmente?',
+                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
+                    placeholder: 'Liste todos los modelos con nombres oficiales...'
+                },
+                {
+                    type: 'text',
+                    title: '¿Cuáles son los nombres correctos de estos modelos?',
+                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
+                    placeholder: 'Nombres oficiales de modelos'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se planea el lanzamiento de nuevos modelos próximamente?',
+                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
+                    options: ['Sí, este año', 'Sí, próximo año', 'No', 'No sé']
+                },
+                {
+                    type: 'textarea',
+                    title: '¿Cuáles son las diferencias clave entre modelos (si hay)?',
+                    reason: 'Construcción de directorio de modelos y determinación de compatibilidad.',
+                    placeholder: 'Describa diferencias técnicas y funcionales...'
+                },
+                
+                // Sección 4: Matriz de Compatibilidad
+                {
+                    type: 'textarea',
+                    title: '¿Qué firmwares son compatibles con qué modelos de dispositivos?',
+                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
+                    placeholder: 'Describa matriz de compatibilidad...'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se admite compatibilidad hacia atrás (dispositivos antiguos + firmware nuevo)?',
+                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
+                    options: ['Sí, completamente', 'Parcialmente', 'No', 'Depende del modelo']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se admite compatibilidad hacia adelante (dispositivos nuevos + firmware antiguo)?',
+                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
+                    options: ['Sí, completamente', 'Parcialmente', 'No', 'No recomendado']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Es posible degradar firmware a versión anterior?',
+                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
+                    options: ['Sí, siempre', 'Sí, con limitaciones', 'No', 'No recomendado']
+                },
+                {
+                    type: 'textarea',
+                    title: '¿Existen limitaciones o recomendaciones para actualización entre versiones?',
+                    reason: 'Prevención de instalación de firmware incompatible y recomendaciones correctas al usuario.',
+                    placeholder: 'Describa limitaciones y recomendaciones...'
+                },
+                
+                // Sección 5: Especificaciones Técnicas de Archivos de Firmware
+                {
+                    type: 'checkbox',
+                    title: '¿Qué formato de archivo de firmware se usa?',
+                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    options: ['.bin', '.hex', '.fw', '.dat', 'archivo .zip', 'Otro']
+                },
+                {
+                    type: 'text',
+                    title: '¿Tamaño típico de archivo de firmware (en MB)?',
+                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    placeholder: 'Ej., 512 MB o 1-2 GB'
+                },
+                {
+                    type: 'radio',
+                    title: '¿El firmware se suministra como archivo único o archivo (.zip)?',
+                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    options: ['Archivo único', 'Archivo ZIP', 'Otro archivo', 'Depende de versión']
+                },
+                {
+                    type: 'checkbox',
+                    title: '¿Se usan firmas digitales para verificación de integridad?',
+                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    options: [
+                        'Suma MD5',
+                        'Suma SHA-256',
+                        'Firma digital',
+                        'Otro método',
+                        'No se usa'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: '¿Hay metadatos de servicio en el archivo de firmware?',
+                    reason: 'Validación de archivos en carga, verificación de integridad, planificación de almacenamiento.',
+                    options: ['Sí', 'No', 'No sé']
+                },
+                
+                // Sección 6: Metadatos de Firmware
+                {
+                    type: 'textarea',
+                    title: '¿Qué información oficial debe acompañar cada versión de firmware?',
+                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    placeholder: 'Describa metadatos requeridos...'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se publica registro de cambios (changelog) para cada versión?',
+                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    options: ['Sí, siempre', 'A veces', 'No', 'Planificado']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se especifica fecha oficial de lanzamiento?',
+                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    options: ['Sí', 'No']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Hay actualizaciones críticas que requieren instalación obligatoria?',
+                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    options: ['Sí', 'No', 'Raramente', 'Planificado']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se publica información de compatibilidad con revisiones de hardware específicas?',
+                    reason: 'Información completa para usuarios y gestión correcta de actualizaciones.',
+                    options: ['Sí, siempre', 'A veces', 'No']
+                },
+                
+                // Sección 7: Proceso de Actualización de Firmware
+                {
+                    type: 'checkbox',
+                    title: '¿Cómo se realiza la actualización de firmware?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    options: [
+                        'Vía unidad USB',
+                        'Ethernet/LAN',
+                        'Wi-Fi',
+                        'Interfaz web',
+                        'Otros métodos'
+                    ]
+                },
+                {
+                    type: 'textarea',
+                    title: '¿Cuál es el procedimiento detallado de actualización desde perspectiva del usuario final?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    placeholder: 'Describa paso a paso...'
+                },
+                {
+                    type: 'checkbox',
+                    title: '¿Qué requisitos tiene la unidad USB (formato de sistema de archivos, tamaño mínimo)?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    options: [
+                        'FAT32',
+                        'NTFS',
+                        'Mínimo 512 MB',
+                        'Mínimo 2 GB',
+                        'Sin requisitos especiales'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se necesita estructura especial de directorios en unidad USB?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    options: ['Sí', 'No', 'Recomendado']
+                },
+                {
+                    type: 'text',
+                    title: '¿Cómo identifica el dispositivo el archivo de firmware en la unidad?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    placeholder: 'Describa mecanismo de identificación'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Hay validación integrada de firmware antes de instalación?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    options: ['Sí, automática', 'Sí, manual', 'No']
+                },
+                {
+                    type: 'text',
+                    title: '¿Cuál es la duración típica del proceso de actualización?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    placeholder: 'Ej., 5-10 minutos'
+                },
+                {
+                    type: 'textarea',
+                    title: '¿Son posibles errores durante actualización y cómo diagnosticarlos?',
+                    reason: 'Creación de instrucciones claras para usuarios del sistema.',
+                    placeholder: 'Describa errores típicos y métodos de diagnóstico...'
+                },
+                
+                // Sección 8: Frecuencia y Política de Actualizaciones
+                {
+                    type: 'radio',
+                    title: '¿Con qué frecuencia se lanzan nuevas versiones de firmware?',
+                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    options: [
+                        'Mensualmente',
+                        'Trimestralmente',
+                        'Semestralmente',
+                        'Según necesidad',
+                        'Sin calendario regular'
+                    ]
+                },
+                {
+                    type: 'checkbox',
+                    title: '¿Qué principio determina el lanzamiento de nueva versión?',
+                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    options: [
+                        'Corrección de errores',
+                        'Nuevas funciones',
+                        'Correcciones críticas',
+                        'Actualizaciones programadas',
+                        'Solicitudes de clientes'
+                    ]
+                },
+                {
+                    type: 'text',
+                    title: '¿Cuánto tiempo se admiten versiones anteriores de firmware?',
+                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    placeholder: 'Ej., 1 año, 2 años'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Existe política de fin de vida útil para versiones antiguas?',
+                    reason: 'Planificación de mantenimiento del sistema y notificación de usuarios.',
+                    options: ['Sí', 'No', 'En desarrollo']
+                },
+                
+                // Sección 9: Acceso a Firmware
+                {
+                    type: 'checkbox',
+                    title: '¿Cómo se distribuyen actualmente los firmwares a los clientes?',
+                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
+                    options: [
+                        'Sitio web oficial',
+                        'Distribución por correo',
+                        'A través de distribuidores',
+                        'Por solicitud',
+                        'Notificación automática',
+                        'Otro'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: '¿Existe portal oficial o repositorio para descargas de firmware?',
+                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
+                    options: ['Sí, público', 'Sí, requiere autorización', 'No', 'En desarrollo']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Se requiere autorización para acceso a archivos de firmware?',
+                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
+                    options: ['Sí', 'No', 'Depende de versión']
+                },
+                {
+                    type: 'text',
+                    title: '¿Cómo se proporciona soporte técnico para problemas de actualización?',
+                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
+                    placeholder: 'Describa canales de soporte'
+                },
+                {
+                    type: 'radio',
+                    title: '¿Está disponible el historial de todas las versiones o solo la última?',
+                    reason: 'Integración con procesos existentes de distribución de actualizaciones.',
+                    options: ['Todas las versiones', 'Solo últimas 5', 'Solo actual', 'Sin archivo']
+                },
+                
+                // Sección 10: Documentación y Capacitación
+                {
+                    type: 'checkbox',
+                    title: '¿Se proporciona documentación técnica sobre actualizaciones de firmware?',
+                    reason: 'Sistema de ayuda integrado para usuarios.',
+                    options: [
+                        'Sí, manuales PDF',
+                        'Sí, documentación en línea',
+                        'Sí, tutoriales en video',
+                        'No',
+                        'En desarrollo'
+                    ]
+                },
+                {
+                    type: 'radio',
+                    title: '¿Hay tutoriales en video o materiales de capacitación disponibles?',
+                    reason: 'Sistema de ayuda integrado para usuarios.',
+                    options: ['Sí', 'No', 'Planificado']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Estos materiales están disponibles digitalmente para integración en sistema?',
+                    reason: 'Sistema de ayuda integrado para usuarios.',
+                    options: ['Sí, todos', 'Parcialmente', 'No', 'Por solicitud']
+                },
+                {
+                    type: 'radio',
+                    title: '¿Existen problemas típicos y soluciones (guía de solución de problemas)?',
+                    reason: 'Sistema de ayuda integrado para usuarios.',
+                    options: ['Sí', 'No', 'En desarrollo']
+                }
+            ]
+        };
+
+        const translations = {
+            ru: {
+                prevBtn: '↑ Назад',
+                nextBtn: 'Далее',
+                questionOf: 'Вопрос',
+                of: 'из',
+                enterHint: 'Нажмите',
+                or: 'или',
+                toContinue: 'для продолжения',
+                finalTitle: 'Спасибо за ваши ответы! 🎉',
+                finalText: 'Вы прошли все',
+                questions: 'вопросов',
+                downloadJSON: '💾 Скачать JSON',
+                downloadTXT: '📄 Скачать TXT',
+                reasonLabel: 'Зачем нам это:'
+            },
+            en: {
+                prevBtn: '↑ Back',
+                nextBtn: 'Next',
+                questionOf: 'Question',
+                of: 'of',
+                enterHint: 'Press',
+                or: 'or',
+                toContinue: 'to continue',
+                finalTitle: 'Thank you for your answers! 🎉',
+                finalText: 'You completed all',
+                questions: 'questions',
+                downloadJSON: '💾 Download JSON',
+                downloadTXT: '📄 Download TXT',
+                reasonLabel: 'Why we need this:'
+            },
+            es: {
+                prevBtn: '↑ Atrás',
+                nextBtn: 'Siguiente',
+                questionOf: 'Pregunta',
+                of: 'de',
+                enterHint: 'Presione',
+                or: 'o',
+                toContinue: 'para continuar',
+                finalTitle: '¡Gracias por sus respuestas! 🎉',
+                finalText: 'Completó todas',
+                questions: 'preguntas',
+                downloadJSON: '💾 Descargar JSON',
+                downloadTXT: '📄 Descargar TXT',
+                reasonLabel: 'Por qué necesitamos esto:'
+            }
+        };
+
+        function initSurvey() {
+            const container = document.getElementById('questionsContainer');
+            const currentQuestions = questions[currentLanguage];
+            const t = translations[currentLanguage];
+            
+            container.innerHTML = '';
+            
+            currentQuestions.forEach((q, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'question-slide';
+                slide.innerHTML = `
+                    <div class="question-content">
+                        <div class="question-number">${t.questionOf} ${index + 1} ${t.of} ${currentQuestions.length}</div>
+                        <h1 class="question-title">${q.title}</h1>
+                        <div class="question-reason"><strong>${t.reasonLabel}</strong> ${q.reason}</div>
+                        ${renderAnswerInput(q, index)}
+                    </div>
+                `;
+                container.appendChild(slide);
+            });
+            
+            // Add final screen
+            const finalSlide = document.createElement('div');
+            finalSlide.className = 'question-slide';
+            finalSlide.innerHTML = `
+                <div class="question-content final-screen">
+                    <h2>${t.finalTitle}</h2>
+                    <p>${t.finalText} ${currentQuestions.length} ${t.questions}</p>
+                    <div class="export-buttons">
+                        <button class="export-btn" onclick="exportJSON()">${t.downloadJSON}</button>
+                        <button class="export-btn" onclick="exportText()">${t.downloadTXT}</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(finalSlide);
+            
+            updateView();
+        }
+
+        function renderAnswerInput(question, index) {
+            const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            
+            if (question.type === 'radio') {
+                return `
+                    <div class="options">
+                        ${question.options.map((opt, i) => `
+                            <div class="option" onclick="selectRadio(${index}, '${opt.replace(/'/g, "\\'")}', this)">
+                                <span class="option-letter">${letters[i]}</span>
+                                <span>${opt}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (question.type === 'checkbox') {
+                return `
+                    <div class="options">
+                        ${question.options.map((opt, i) => `
+                            <div class="option checkbox-option">
+                                <input type="checkbox" id="q${index}_${i}" onchange="updateCheckbox(${index})">
+                                <label for="q${index}_${i}">${opt}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (question.type === 'textarea') {
+                return `
+                    <textarea class="answer-input" 
+                              placeholder="${question.placeholder}"
+                              oninput="saveAnswer(${index}, this.value)"
+                              onkeydown="handleTextareaKey(event, ${index})">${answers[index] || ''}</textarea>
+                    <div class="hint">Shift+Enter для новой строки, Enter для продолжения</div>
+                `;
+            } else {
+                return `
+                    <input type="text" class="answer-input" 
+                           placeholder="${question.placeholder}"
+                           value="${answers[index] || ''}"
+                           oninput="saveAnswer(${index}, this.value)"
+                           onkeydown="handleEnterKey(event)">
+                    <div class="hint">Нажмите Enter для продолжения</div>
+                `;
+            }
+        }
+
+        function selectRadio(questionIndex, value, element) {
+            answers[questionIndex] = value;
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            
+            setTimeout(() => nextQuestion(), 300);
+        }
+
+        function updateCheckbox(questionIndex) {
+            const currentQuestions = questions[currentLanguage];
+            const checkboxes = document.querySelectorAll(`input[id^="q${questionIndex}_"]`);
+            const selected = [];
+            checkboxes.forEach((cb, i) => {
+                if (cb.checked) selected.push(currentQuestions[questionIndex].options[i]);
+            });
+            answers[questionIndex] = selected;
+        }
+
+        function saveAnswer(index, value) {
+            answers[index] = value;
+        }
+
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                nextQuestion();
+            }
+        }
+
+        function handleTextareaKey(event, index) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                nextQuestion();
+            }
+        }
+
+        function nextQuestion() {
+            const totalQuestions = questions[currentLanguage].length;
+            if (currentQuestion >= totalQuestions) return;
+            
+            currentQuestion++;
+            updateView();
+        }
+
+        function previousQuestion() {
+            if (currentQuestion === 0) return;
+            currentQuestion--;
+            updateView();
+        }
+
+        function updateView() {
+            const container = document.getElementById('questionsContainer');
+            const totalQuestions = questions[currentLanguage].length;
+            const t = translations[currentLanguage];
+            
+            container.style.transform = `translateY(-${currentQuestion * 100}vh)`;
+            
+            // Update progress
+            const progress = ((currentQuestion) / (totalQuestions + 1)) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.querySelector('.nav-text').textContent = t.prevBtn;
+            document.querySelectorAll('.nav-text')[1].textContent = t.nextBtn;
+            
+            const nextBtn = document.getElementById('nextBtn');
+            const enterHint = document.querySelector('.enter-hint');
+            
+            if (currentQuestion >= totalQuestions) {
+                nextBtn.style.display = 'none';
+                enterHint.style.display = 'none';
+            } else {
+                nextBtn.style.display = 'block';
+                enterHint.style.display = 'flex';
+            }
+        }
+
+        function changeLanguage(lang) {
+            if (lang === currentLanguage) return;
+            
+            currentLanguage = lang;
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Re-init survey
+            currentQuestion = 0;
+            initSurvey();
+        }
+
+        function exportJSON() {
+            const currentQuestions = questions[currentLanguage];
+            const data = {
+                language: currentLanguage,
+                timestamp: new Date().toISOString(),
+                totalQuestions: currentQuestions.length,
+                answers: currentQuestions.map((q, i) => ({
+                    question: q.title,
+                    reason: q.reason,
+                    type: q.type,
+                    answer: answers[i] || null
+                }))
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            downloadFile(blob, 'mct_survey_answers.json');
+        }
+
+        function exportText() {
+            const currentQuestions = questions[currentLanguage];
+            const t = translations[currentLanguage];
+            let text = 'MCT Unit Technical Information Request\n';
+            text += '='.repeat(60) + '\n\n';
+            text += `Date: ${new Date().toLocaleString()}\n`;
+            text += `Language: ${currentLanguage.toUpperCase()}\n\n`;
+            
+            currentQuestions.forEach((q, i) => {
+                text += `${i + 1}. ${q.title}\n`;
+                text += `${t.reasonLabel} ${q.reason}\n`;
+                text += '-'.repeat(60) + '\n';
+                const answer = answers[i];
+                if (Array.isArray(answer)) {
+                    text += `Answer: ${answer.join(', ')}\n`;
+                } else {
+                    text += `Answer: ${answer || '[No answer]'}\n`;
+                }
+                text += '\n';
+            });
+            
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            downloadFile(blob, 'mct_survey_answers.txt');
+        }
+
+        function downloadFile(blob, filename) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || (e.key === 'Enter' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
+                e.preventDefault();
+                nextQuestion();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                previousQuestion();
+            }
+        });
+
+        // Initialize
+        initSurvey();
+    </script>
+</body>
+</html>
