@@ -1782,15 +1782,14 @@
 
         function changeLanguage(lang) {
             if (lang === currentLanguage) return;
-            
+
             currentLanguage = lang;
-            
+
             // Update active button
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // Re-init survey
-            currentQuestion = 0;
+
+            // Re-init survey keeping current question
             initSurvey();
         }
 
