@@ -1714,6 +1714,16 @@ const questions = {
 
         // Block ALL scroll when keyboard is open
         document.addEventListener('touchmove', (e) => {
+            // Double-check keyboard state to prevent stuck blocking
+            if (window.visualViewport) {
+                const currentViewportHeight = window.visualViewport.height;
+                const fullHeight = window.innerHeight;
+                if (Math.abs(currentViewportHeight - fullHeight) < 50) {
+                    isKeyboardOpen = false;
+                    keyboardAdjustment = 0;
+                }
+            }
+
             if (isKeyboardOpen) {
                 // Only allow scrolling on textarea (for long text input)
                 const isTextarea = e.target.tagName === 'TEXTAREA';
@@ -1742,6 +1752,18 @@ const questions = {
         let touchEndX = 0;
 
         document.addEventListener('touchstart', (e) => {
+            // Double-check keyboard state based on current viewport height
+            // This fixes cases where blur/viewport events didn't fire
+            if (window.visualViewport) {
+                const currentViewportHeight = window.visualViewport.height;
+                const fullHeight = window.innerHeight;
+                // If viewport is close to full height, keyboard is definitely closed
+                if (Math.abs(currentViewportHeight - fullHeight) < 50) {
+                    isKeyboardOpen = false;
+                    keyboardAdjustment = 0;
+                }
+            }
+
             // Don't process swipes if keyboard is open or touching input
             if (isKeyboardOpen || e.target.matches('.answer-input')) {
                 return;
@@ -1751,6 +1773,16 @@ const questions = {
         }, { passive: true });
 
         document.addEventListener('touchend', (e) => {
+            // Double-check keyboard state
+            if (window.visualViewport) {
+                const currentViewportHeight = window.visualViewport.height;
+                const fullHeight = window.innerHeight;
+                if (Math.abs(currentViewportHeight - fullHeight) < 50) {
+                    isKeyboardOpen = false;
+                    keyboardAdjustment = 0;
+                }
+            }
+
             // Don't process swipes if keyboard is open or touching input
             if (isKeyboardOpen || e.target.matches('.answer-input')) {
                 return;
