@@ -22,18 +22,6 @@
             overflow: hidden;
         }
 
-        body.keyboard-open {
-            overflow: hidden;
-        }
-
-        body.keyboard-open .questions-container {
-            overflow: hidden;
-        }
-
-        body.keyboard-open .question-slide {
-            overflow: visible;
-        }
-
         .header {
             position: fixed;
             top: 0;
@@ -512,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:40 UTC';
+        const BUILD_VERSION = '2025-11-05 08:45 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1628,11 +1616,10 @@ const questions = {
             if (currentHeight < lastViewportHeight - 100) {
                 // Keyboard opened
                 isKeyboardOpen = true;
-                document.body.classList.add('keyboard-open');
             } else if (currentHeight > lastViewportHeight + 100) {
                 // Keyboard closed
                 isKeyboardOpen = false;
-                document.body.classList.remove('keyboard-open');
+                keyboardAdjustment = 0;
 
                 // Reset scroll on all question slides
                 document.querySelectorAll('.question-slide').forEach(slide => {
@@ -1660,33 +1647,40 @@ const questions = {
             window.visualViewport.addEventListener('scroll', handleViewportChange);
         }
 
+        // Store original transform for keyboard adjustment
+        let keyboardAdjustment = 0;
+
         // Handle focus on input fields - track keyboard state and position correctly
         document.addEventListener('focus', (e) => {
             if (e.target.matches('.answer-input')) {
                 isKeyboardOpen = true;
-                document.body.classList.add('keyboard-open');
 
                 // Use visualViewport to properly position input above keyboard
                 setTimeout(() => {
                     if (window.visualViewport) {
                         const inputRect = e.target.getBoundingClientRect();
                         const viewportHeight = window.visualViewport.height;
-                        const inputBottom = inputRect.bottom;
+                        const inputTop = inputRect.top;
+                        const inputHeight = inputRect.height;
 
-                        // If input is below visible viewport, scroll it into view
-                        if (inputBottom > viewportHeight) {
-                            const currentSlide = e.target.closest('.question-slide');
-                            if (currentSlide) {
-                                const scrollAmount = inputBottom - viewportHeight + 20; // 20px padding
-                                currentSlide.scrollTop += scrollAmount;
+                        // Position input in the top third of visible viewport
+                        const targetPosition = viewportHeight / 3;
+
+                        if (inputTop > targetPosition) {
+                            // Calculate how much to shift container up
+                            keyboardAdjustment = inputTop - targetPosition;
+
+                            const container = document.getElementById('questionsContainer');
+                            if (container) {
+                                const baseTransform = currentQuestion * fixedSlideHeight;
+                                container.style.transform = `translateY(-${baseTransform + keyboardAdjustment}px)`;
                             }
                         }
                     } else {
                         // Fallback for browsers without visualViewport
                         e.target.scrollIntoView({
                             behavior: 'smooth',
-                            block: 'center',
-                            inline: 'nearest'
+                            block: 'start'
                         });
                     }
                 }, 300); // Wait for keyboard animation
@@ -1697,7 +1691,7 @@ const questions = {
         document.addEventListener('blur', (e) => {
             if (e.target.matches('.answer-input')) {
                 isKeyboardOpen = false;
-                document.body.classList.remove('keyboard-open');
+                keyboardAdjustment = 0;
                 setTimeout(() => {
                     // Reset scroll positions
                     document.querySelectorAll('.question-slide').forEach(slide => {
