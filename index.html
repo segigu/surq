@@ -500,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:25 UTC';
+        const BUILD_VERSION = '2025-11-05 08:30 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -515,6 +515,7 @@
         let currentQuestion = 0;
         let currentLanguage = 'ru';
         const answers = {};
+        let isKeyboardOpen = false;
 
 const questions = {
             ru: [
@@ -1611,8 +1612,14 @@ const questions = {
 
             const currentHeight = window.visualViewport.height;
 
-            // If viewport height increased significantly, keyboard likely closed
-            if (currentHeight > lastViewportHeight + 100) {
+            // Detect keyboard state based on viewport height change
+            if (currentHeight < lastViewportHeight - 100) {
+                // Keyboard opened
+                isKeyboardOpen = true;
+            } else if (currentHeight > lastViewportHeight + 100) {
+                // Keyboard closed
+                isKeyboardOpen = false;
+
                 // Reset scroll on all question slides
                 document.querySelectorAll('.question-slide').forEach(slide => {
                     slide.scrollTop = 0;
@@ -1639,9 +1646,10 @@ const questions = {
             window.visualViewport.addEventListener('scroll', handleViewportChange);
         }
 
-        // Handle focus on input fields - prevent browser auto-scroll and position correctly
+        // Handle focus on input fields - track keyboard state and position correctly
         document.addEventListener('focus', (e) => {
             if (e.target.matches('.answer-input')) {
+                isKeyboardOpen = true;
                 // Prevent default browser scroll behavior
                 setTimeout(() => {
                     // Scroll the input into view within its slide container
@@ -1657,6 +1665,7 @@ const questions = {
         // Fallback: also handle blur on input fields
         document.addEventListener('blur', (e) => {
             if (e.target.matches('.answer-input')) {
+                isKeyboardOpen = false;
                 setTimeout(() => {
                     // Reset scroll positions
                     document.querySelectorAll('.question-slide').forEach(slide => {
@@ -1674,6 +1683,60 @@ const questions = {
                 }, 300);
             }
         }, true);
+
+        // Block scroll when keyboard is open
+        document.addEventListener('touchmove', (e) => {
+            if (isKeyboardOpen) {
+                // Allow scrolling only within the input field's container
+                if (!e.target.closest('.question-content')) {
+                    e.preventDefault();
+                }
+            }
+        }, { passive: false });
+
+        // Swipe gestures for navigation
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let touchEndY = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', (e) => {
+            // Don't process swipes if keyboard is open or touching input
+            if (isKeyboardOpen || e.target.matches('.answer-input')) {
+                return;
+            }
+            touchStartY = e.changedTouches[0].screenY;
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            // Don't process swipes if keyboard is open or touching input
+            if (isKeyboardOpen || e.target.matches('.answer-input')) {
+                return;
+            }
+            touchEndY = e.changedTouches[0].screenY;
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const diffY = touchStartY - touchEndY;
+            const diffX = touchStartX - touchEndX;
+
+            // Check if vertical swipe is more significant than horizontal
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                // Minimum swipe distance threshold
+                if (Math.abs(diffY) > 50) {
+                    if (diffY > 0) {
+                        // Swipe up - next question
+                        nextQuestion();
+                    } else {
+                        // Swipe down - previous question
+                        previousQuestion();
+                    }
+                }
+            }
+        }
 
         // Initialize
         initSurvey();
