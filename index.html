@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Cache busting: prevent browser from caching this page -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>MCT Unit Survey</title>
     <style>
         * {
@@ -319,6 +323,20 @@
             gap: 8px;
         }
 
+        .version-badge {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            padding: 6px 12px;
+            background: rgba(0, 0, 0, 0.7);
+            color: #fff;
+            font-size: 11px;
+            border-radius: 4px;
+            font-family: monospace;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
         .enter-key {
             padding: 4px 8px;
             background: #f5f5f5;
@@ -477,7 +495,23 @@
         Нажмите <span class="enter-key">Enter</span> или <span class="enter-key">↓</span> для продолжения
     </div>
 
+    <!-- Version badge for cache verification -->
+    <div class="version-badge" id="versionBadge"></div>
+
     <script>
+        // Set version with current timestamp for cache verification
+        const BUILD_VERSION = '2025-11-05 06:55 UTC';
+        const BUILD_TIMESTAMP = Date.now();
+
+        // Display version on page
+        document.getElementById('versionBadge').textContent = `v${BUILD_VERSION}`;
+
+        // Log version to console for debugging
+        console.log('%c🚀 MCT Survey Loaded', 'font-size: 16px; font-weight: bold; color: #CC785C;');
+        console.log(`Version: ${BUILD_VERSION}`);
+        console.log(`Timestamp: ${BUILD_TIMESTAMP}`);
+        console.log(`Cache: ${document.querySelector('[http-equiv="Cache-Control"]') ? 'disabled' : 'enabled'}`);
+
         let currentQuestion = 0;
         let currentLanguage = 'ru';
         const answers = {};
