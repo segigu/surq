@@ -500,7 +500,7 @@
 
     <script>
         // Set version with current timestamp for cache verification
-        const BUILD_VERSION = '2025-11-05 08:15 UTC';
+        const BUILD_VERSION = '2025-11-05 08:20 UTC';
         const BUILD_TIMESTAMP = Date.now();
 
         // Display version on page
@@ -1638,6 +1638,21 @@ const questions = {
             window.visualViewport.addEventListener('resize', handleViewportChange);
             window.visualViewport.addEventListener('scroll', handleViewportChange);
         }
+
+        // Handle focus on input fields - prevent browser auto-scroll and position correctly
+        document.addEventListener('focus', (e) => {
+            if (e.target.matches('.answer-input')) {
+                // Prevent default browser scroll behavior
+                setTimeout(() => {
+                    // Scroll the input into view within its slide container
+                    e.target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }, 100);
+            }
+        }, true);
 
         // Fallback: also handle blur on input fields
         document.addEventListener('blur', (e) => {
